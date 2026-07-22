@@ -1,0 +1,21 @@
+# Python Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+venv/
+ENV/
+env/
+
+# Databases
+backend/task_manager.db
+*.sqlite3
+
+# Flask temporary sessions
+backend/flask_sessions/
+
+# OS specific files
+.DS_Store
+Thumbs.db
