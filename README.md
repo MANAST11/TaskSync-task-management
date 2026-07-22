@@ -23,7 +23,7 @@ Features role-based access for two user groups:
 ## Directory Structure
 
 ```text
-mponline-software-taskmanagement/
+task-management/
 ├── backend/
 │   ├── run.py                 # Backend server entry point
 │   ├── requirements.txt       # Dependency definitions
