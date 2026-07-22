@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Administrator console for task management system. Administer departments, staff members, task boards, and track organization progress.">
+    <title>Admin Dashboard - TaskSync</title>
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Specific layouts for Dashboard Dashboard */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background: rgba(17, 24, 39, 0.9);
+            border-right: 1px solid var(--border-light);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            flex-shrink: 0;
+            backdrop-filter: var(--blur-glass);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 10px;
+        }
+
+        .sidebar-brand-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .sidebar-brand-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+        }
+
+        .sidebar-user {
+            padding: 15px;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+        }
+
+        .sidebar-user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #FFF;
+        }
+
+        .sidebar-user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            color: #FFF;
+            background: rgba(99, 102, 241, 0.15);
+            border-left: 3px solid var(--primary);
+        }
+
+        /* Main Workspace */
+        .main-workspace {
+            flex-grow: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        /* Grid cards for statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .stat-card.secondary::before { background: var(--secondary); }
+        .stat-card.success::before { background: var(--success); }
+        .stat-card.danger::before { background: var(--danger); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .stat-val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFF;
+        }
+
+        /* Overview grid layout */
+        .overview-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        /* Data table custom styling */
+        .table-card {
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .table-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-filter-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-grow: 1;
+            flex-wrap: wrap;
+        }
+
+        .data-table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            padding: 14px 16px;
+            border-bottom: 2px solid var(--border-light);
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition-smooth);
+        }
+        .data-table th:hover {
+            color: #FFF;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Actions buttons inside tables */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+        }
+
+        /* Pagination style */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .pagination-info {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .pagination-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Activity logs styling */
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            font-size: 0.85rem;
+        }
+
+        .log-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .log-action {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .log-desc {
+            color: var(--text-secondary);
+        }
+
+        /* Dashboard tabs switcher */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <span class="sidebar-brand-icon">⚡</span>
+                <span class="sidebar-brand-text">TaskSync</span>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="sidebar-user-name" id="user-display-name">Loading...</div>
+                <div class="sidebar-user-role">Administrator</div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a class="sidebar-link active" data-target="overview-section">📊 Overview</a></li>
+                <li><a class="sidebar-link" data-target="tasks-section">📋 Tasks</a></li>
+                <li><a class="sidebar-link" data-target="employees-section">👥 Employees</a></li>
+                <li><a class="sidebar-link" data-target="departments-section">🏢 Departments</a></li>
+                <li><a class="sidebar-link" data-target="activity-section">🪵 Activity Logs</a></li>
+            </ul>
+
+            <button id="logout-btn" class="btn btn-secondary" style="width: 100%;">🚪 Logout</button>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace">
+            <div class="loading-overlay" id="workspace-loader">
+                <div class="loading-spinner"></div>
+            </div>
+
+            <!-- SECTION 1: OVERVIEW -->
+            <section id="overview-section" class="dashboard-section active">
+                <div class="section-header">
+                    <h2 class="section-title">Overview Dashboard</h2>
+                </div>
+
+                <!-- Stats card deck -->
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel">
+                        <span class="stat-label">Total Tasks</span>
+                        <span class="stat-val" id="stat-total-tasks">0</span>
+                    </div>
+                    <div class="stat-card glass-panel secondary">
+                        <span class="stat-label">Pending</span>
+                        <span class="stat-val" id="stat-pending-tasks">0</span>
+                    </div>
+                    <div class="stat-card glass-panel success">
+                        <span class="stat-label">Completed</span>
+                        <span class="stat-val" id="stat-completed-tasks">0</span>
+                    </div>
+                    <div class="stat-card glass-panel danger">
+                        <span class="stat-label">Staff Count</span>
+                        <span class="stat-val" id="stat-employee-count">0</span>
+                    </div>
+                </div>
+
+                <!-- Bottom split -->
+                <div class="overview-layout">
+                    <!-- Left: Recent Assignments -->
+                    <div class="table-card glass-panel">
+                        <h3 style="margin-bottom: 20px;">Recent Task Assignments</h3>
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Task</th>
+                                        <th>Assignee</th>
+                                        <th>Status</th>
+                                        <th>Completion</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-assignments-body">
+                                    <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No assignments loaded.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Right: Recent Audits -->
+                    <div class="table-card glass-panel">
+                        <h3 style="margin-bottom: 20px;">Recent Activities</h3>
+                        <div class="log-list" id="recent-logs-body">
+                            <div style="text-align: center; color: var(--text-muted); padding: 20px;">No logs loaded.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: TASKS MANAGEMENT -->
+            <section id="tasks-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">Task Board</h2>
+                    <button class="btn btn-primary" onclick="openCreateTaskModal()">➕ Create Task</button>
+                </div>
+
+                <div class="table-card glass-panel">
+                    <div class="table-header-row">
+                        <!-- Search & Filter bar -->
+                        <div class="search-filter-bar">
+                            <input type="text" id="task-search-input" class="form-input" style="max-width: 250px;" placeholder="Search task title/details...">
+                            
+                            <select id="task-priority-filter" class="form-select" style="max-width: 150px;">
+                                <option value="">All Priorities</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+
+                            <select id="task-status-filter" class="form-select" style="max-width: 150px;">
+                                <option value="">All Statuses</option>
+                                <option value="pending">Pending</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+
+                            <button id="task-filter-btn" class="btn btn-secondary btn-icon">Apply</button>
+                            <button id="task-reset-btn" class="btn btn-secondary btn-icon">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="title">Task Title</th>
+                                    <th data-sort="priority">Priority</th>
+                                    <th data-sort="estimated_hours">Est. Hours</th>
+                                    <th>Assignee(s)</th>
+                                    <th data-sort="created_at">Created At</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasks-table-body">
+                                <tr><td colspan="6" style="text-align: center;">Loading tasks...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container">
+                        <div class="pagination-info" id="task-pagination-info">Showing 0 of 0 tasks</div>
+                        <div class="pagination-btns">
+                            <button class="btn btn-secondary btn-icon" id="task-prev-btn">Previous</button>
+                            <button class="btn btn-secondary btn-icon" id="task-next-btn">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: EMPLOYEES MANAGEMENT -->
+            <section id="employees-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">Employee Directory</h2>
+                    <button class="btn btn-primary" onclick="openCreateEmployeeModal()">➕ Add Employee</button>
+                </div>
+
+                <div class="table-card glass-panel">
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Full Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employees-table-body">
+                                <tr><td colspan="7" style="text-align: center;">Loading employee records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: DEPARTMENTS -->
+            <section id="departments-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">Departments</h2>
+                    <button class="btn btn-primary" onclick="openCreateDepartmentModal()">➕ Create Department</button>
+                </div>
+
+                <div class="table-card glass-panel" style="max-width: 800px;">
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departments-table-body">
+                                <tr><td colspan="3" style="text-align: center;">Loading departments...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: SYSTEM LOGS -->
+            <section id="activity-section" class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">System Activity Log</h2>
+                </div>
+
+                <div class="table-card glass-panel">
+                    <div class="log-list" id="full-logs-body" style="max-height: 600px;">
+                        <div style="text-align: center; color: var(--text-muted); padding: 30px;">Loading logs...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL 1: CREATE/EDIT TASK -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="task-modal-title">Create New Task</h3>
+                <button class="modal-close" onclick="closeModal('task-modal')">&times;</button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-form-id">
+                <div class="form-group">
+                    <label for="task-title" class="form-label">Task Title</label>
+                    <input type="text" id="task-title" class="form-input" required placeholder="e.g. Implement API route">
+                </div>
+                <div class="form-group">
+                    <label for="task-desc" class="form-label">Description</label>
+                    <textarea id="task-desc" class="form-textarea" placeholder="Describe the details and deliverables..."></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="task-priority" class="form-label">Priority</label>
+                        <select id="task-priority" class="form-select">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="task-hours" class="form-label">Estimated Hours</label>
+                        <input type="number" step="0.5" id="task-hours" class="form-input" min="0" value="0.0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: ASSIGN TASK -->
+    <div class="modal-overlay" id="assign-modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Assign Task</h3>
+                <button class="modal-close" onclick="closeModal('assign-modal')">&times;</button>
+            </div>
+            <form id="assign-form">
+                <input type="hidden" id="assign-task-id">
+                <div class="form-group">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" id="assign-task-title" class="form-input" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="assign-employee-select" class="form-label">Assign To Employee</label>
+                    <select id="assign-employee-select" class="form-select" required>
+                        <!-- Dynamic -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('assign-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CREATE/EDIT EMPLOYEE -->
+    <div class="modal-overlay" id="employee-modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="employee-modal-title">Add Employee Account</h3>
+                <button class="modal-close" onclick="closeModal('employee-modal')">&times;</button>
+            </div>
+            <form id="employee-form">
+                <input type="hidden" id="employee-form-id">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="emp-first-name" class="form-label">First Name</label>
+                        <input type="text" id="emp-first-name" class="form-input" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-last-name" class="form-label">Last Name</label>
+                        <input type="text" id="emp-last-name" class="form-input" required placeholder="Doe">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group" id="emp-username-container">
+                        <label for="emp-username" class="form-label">Username</label>
+                        <input type="text" id="emp-username" class="form-input" required placeholder="jdoe">
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-password" class="form-label" id="emp-password-label">Password</label>
+                        <input type="password" id="emp-password" class="form-input" required placeholder="Password123">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="emp-email" class="form-label">Email Address</label>
+                    <input type="email" id="emp-email" class="form-input" required placeholder="john.doe@company.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="emp-phone" class="form-label">Phone Number</label>
+                    <input type="tel" id="emp-phone" class="form-input" placeholder="+123456789">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label for="emp-dept-select" class="form-label">Department</label>
+                        <select id="emp-dept-select" class="form-select">
+                            <option value="">No Department</option>
+                            <!-- Dynamic -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-designation" class="form-label">Designation</label>
+                        <input type="text" id="emp-designation" class="form-input" placeholder="e.g. Senior QA">
+                    </div>
+                </div>
+
+                <div class="form-group" id="emp-status-container" style="display: none;">
+                    <label for="emp-status" class="form-label">Account Status</label>
+                    <select id="emp-status" class="form-select">
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('employee-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 4: CREATE DEPARTMENT -->
+    <div class="modal-overlay" id="department-modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3>Create New Department</h3>
+                <button class="modal-close" onclick="closeModal('department-modal')">&times;</button>
+            </div>
+            <form id="department-form">
+                <div class="form-group">
+                    <label for="dept-name" class="form-label">Department Name</label>
+                    <input type="text" id="dept-name" class="form-input" required placeholder="e.g. Product Strategy">
+                </div>
+                <div class="form-group">
+                    <label for="dept-desc" class="form-label">Description</label>
+                    <textarea id="dept-desc" class="form-textarea" placeholder="Briefly describe what this department manages..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('department-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast container for notifications -->
+    <div id="toast-container"></div>
+
+    <!-- JS Logic -->
+    <script src="js/admin_dashboard.js"></script>
+</body>
+</html>
