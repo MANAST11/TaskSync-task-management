@@ -25,31 +25,31 @@ Features role-based access for two user groups:
 ```text
 TaskSync-task-management/
 ├── backend/
-│   ├── run.py                 # Backend server entry point
-│   ├── requirements.txt       # Dependency definitions
-│   ├── seed.py                # Database creation & mock data seeder
+│   ├── run.py                    # Backend server entry point
+│   ├── requirements.txt          # Dependency definitions
+│   ├── seed.py                   # Database creation & mock data seeder
 │   └── task_management/
-│       ├── __init__.py        # App factory & blueprint bindings
-│       ├── config.py          # Port/Database settings (supports MySQL & SQLite)
-│       ├── extensions.py      # Shared SQLAlchemy & Session instances
-│       ├── models/            # SQLAlchemy database ORM models
-│       ├── routes/            # Blueprint API request controllers
-│       ├── services/          # Decoupled business logic services
-│       └── utils/             # Authorization decorators
+│       ├── __init__.py           # App factory & blueprint bindings
+│       ├── config.py             # Port/Database settings (supports MySQL & SQLite)
+│       ├── extensions.py         # Shared SQLAlchemy & Session instances
+│       ├── models/               # SQLAlchemy database ORM models
+│       ├── routes/               # Blueprint API request controllers
+│       ├── services/             # Decoupled business logic services
+│       └── utils/                # Authorization decorators
 ├── frontend/
-│   ├── login.html             # Auth landing page
-│   ├── admin_dashboard.html   # Administrator SPA board
-│   ├── employee_dashboard.html# Employee workspace SPA board
+│   ├── login.html                # Auth landing page
+│   ├── admin_dashboard.html      # Administrator SPA board
+│   ├── employee_dashboard.html   # Employee workspace SPA board
 │   ├── css/
-│   │   └── styles.css         # Custom responsive layout & design system
+│   │   └── styles.css            # Custom responsive layout & design system
 │   └── js/
-│       ├── login.js           # Authentication handler
-│       ├── admin_dashboard.js # Admin views, CRUD, and pagination controller
-│       └── employee_dashboard.js# Employee progress, slider, and profile controller
+│       ├── login.js              # Authentication handler
+│       ├── admin_dashboard.js    # Admin views, CRUD, and pagination controller
+│       └── employee_dashboard.js # Employee progress, slider, and profile controller
 ├── database/
-│   ├── schema.sql             # SQL Schema definition (MySQL)
-│   └── sample_data.sql        # Reference SQL sample queries
-└── README.md                  # System Documentation
+│   ├── schema.sql                # SQL Schema definition (MySQL)
+│   └── sample_data.sql           # Reference SQL sample queries
+└── README.md                     # System Documentation
 ```
 
 ---
